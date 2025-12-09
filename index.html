@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>ChatGPT Demo</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+      }
+
+      #chat {
+        border: 1px solid #ccc;
+        padding: 10px;
+        height: 300px;
+        overflow-y: scroll;
+      }
+
+      #userInput {
+        width: 80%;
+      }
+
+      #sendBtn {
+        width: 18%;
+      }
+
+      .message {
+        margin: 5px 0;
+      }
+
+      .user {
+        color: blue;
+      }
+
+      .gpt {
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>ChatGPT Demo</h2>
+    <div id="chat"></div>
+    <input type="text" id="userInput" placeholder="Type a message..." />
+    <button id="sendBtn">Send</button>
+    <script>
+      const chatDiv = document.getElementById('chat');
+      const input = document.getElementById('userInput');
+      const btn = document.getElementById('sendBtn');
+      btn.addEventListener('click', async () => {
+        const message = input.value;
+        if (!message) return;
+        appendMessage('user', message);
+        input.value = '';
+        // Gọi backend API (cần deploy trên Pages hoặc serverless)
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message
+          })
+        });
+        const data = await res.json();
+        appendMessage('gpt', data.reply);
+      });
+
+      function appendMessage(role, text) {
+        const div = document.createElement('div');
+        div.classList.add('message', role);
+        div.textContent = `${role}: ${text}`;
+        chatDiv.appendChild(div);
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+      }
+    </script>
+  </body>
+</html>
